@@ -1,4 +1,4 @@
-package main
+package pattern
 
 import "fmt"
 
@@ -107,6 +107,6 @@ func main() {
 	//-----------------------------------------------------------------------------
 	anotherBuilder := NewAnotherBuilder()
 	director.setBuilder(anotherBuilder)
-	launchAnother := director.buildToLaunch()
-	fmt.Println(launchAnother.firstElement)
+	launch = director.buildToLaunch()
+	fmt.Println(launch.firstElement)
 }
