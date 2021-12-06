@@ -8,6 +8,9 @@ import "fmt"
 	https://en.wikipedia.org/wiki/Builder_pattern
 */
 
+// Хорош в разных представлениях обьекта, создавая его пошагово, но минус в том,
+// что он достаточно большой и значительно усложняет код программы
+
 type Builder struct {
 	firstElement  string
 	secondElement string
@@ -86,7 +89,7 @@ func newDirector(b BuilderInterface) *Director {
 	}
 }
 
-func (d Director) setBuilder(b BuilderInterface) {
+func (d *Director) setBuilder(b BuilderInterface) {
 	d.bilder = b
 }
 func (d Director) buildToLaunch() Launch {
@@ -104,6 +107,6 @@ func main() {
 	//-----------------------------------------------------------------------------
 	anotherBuilder := NewAnotherBuilder()
 	director.setBuilder(anotherBuilder)
-	launch = director.buildToLaunch()
-	fmt.Println(launch.firstElement)
+	launchAnother := director.buildToLaunch()
+	fmt.Println(launchAnother.firstElement)
 }
