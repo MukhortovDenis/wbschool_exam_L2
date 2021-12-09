@@ -94,7 +94,7 @@ func Unpacking(r []rune) (string, error) {
 }
 
 func main() {
-	str, err := GetRune(` a4bc2d5e`)
+	str, err := GetRune(`qwe\\5`)
 	if err != nil {
 		fmt.Println(err)
 		return
