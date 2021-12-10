@@ -1,5 +1,11 @@
 package main
 
+import (
+	"fmt"
+	"sort"
+	"strings"
+)
+
 /*
 === Поиск анаграмм по словарю ===
 
@@ -19,6 +25,39 @@ package main
 Программа должна проходить все тесты. Код должен проходить проверки go vet и golint.
 */
 
-func main() {
+func searchAnagramma(dict *[]string) *map[string][]string {
+	dictMap := make(map[string][]string)
+	runeVal := make(map[string]int)
+	runeBool := make(map[string]bool)
+	for _, word := range *dict {
+		word = strings.ToLower(word)
+		atRune := []rune(word)
+		var val int
+		for i := range atRune {
+			val += int(atRune[i])
+		}
+		runeVal[word] = val
 
+	}
+	fmt.Println(runeVal)
+	for _, elem := range *dict {
+		elem = strings.ToLower(elem)
+		slice := []string{}
+		if !runeBool[elem] {
+			slice = append(slice, elem)
+			runeBool[elem] = true
+		}
+		for key2, value2 := range runeVal {
+			if elem != key2 && runeVal[elem] == value2 && len(elem) == len(key2) && !runeBool[key2] {
+				slice = append(slice, key2)
+				runeBool[key2] = true
+			}
+		}
+		if len(slice) > 1 {
+			sort.Strings(slice)
+			dictMap[elem] = slice
+		}
+	}
+	fmt.Println(dictMap)
+	return &dictMap
 }
