@@ -20,7 +20,6 @@ func Test_searchAnagramma(t *testing.T) {
 	t.Run("testAnagram", func(t *testing.T) {
 		massiv := &[]string{"Тяпка", "пятка", "ток", "коТ", "окт", "тик", "кИт", "Яблоко", "КТО", "НОРКа", "КроНА"}
 		getMap := searchAnagramma(massiv)
-		fmt.Println(checkMap)
 		for key, value := range *getMap {
 			if !reflect.DeepEqual(value, checkMap[key]) {
 				t.Errorf("anagramma() = %v, want %v", getMap, checkMap)

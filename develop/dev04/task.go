@@ -39,7 +39,6 @@ func searchAnagramma(dict *[]string) *map[string][]string {
 		runeVal[word] = val
 
 	}
-	fmt.Println(runeVal)
 	for _, elem := range *dict {
 		elem = strings.ToLower(elem)
 		slice := []string{}
@@ -58,6 +57,5 @@ func searchAnagramma(dict *[]string) *map[string][]string {
 			dictMap[elem] = slice
 		}
 	}
-	fmt.Println(dictMap)
 	return &dictMap
 }
