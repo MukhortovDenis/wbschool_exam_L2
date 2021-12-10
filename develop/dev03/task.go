@@ -37,7 +37,7 @@ import (
 */
 type flagStruct struct {
 	k   *int
-	arr [7]*bool
+	arr [6]*bool
 }
 
 func GetFile(filename string) (*bytes.Buffer, error) {
@@ -65,7 +65,7 @@ func GetStrings(buffer *bytes.Buffer) (string, error) {
 	return sb.String(), nil
 }
 
-func GetFlags() (*int, [7]*bool) {
+func GetFlags() (*int, [6]*bool) {
 	k := flag.Int("k", 0, "Сортировать по колонке")
 	n := flag.Bool("n", false, "Сортировать по числовому значению")
 	r := flag.Bool("r", false, "Сортировать в обратном порядке")
@@ -73,16 +73,88 @@ func GetFlags() (*int, [7]*bool) {
 	M := flag.Bool("M", false, "Сортировать по месяцам(англ)")
 	b := flag.Bool("b", false, "Игнорировать пробелы")
 	c := flag.Bool("c", false, "Проверка")
-	h := flag.Bool("h", false, "Сортировать по числовому значению с учетом суффиксов")
-	arr := [7]*bool{n, r, u, M, b, c, h}
+	arr := [6]*bool{n, r, u, M, b, c}
 	return k, arr
 }
 
+func CreateFile(path string, str string) error {
+	f, err := os.Create("new_" + path)
+	if err != nil {
+		return err
+	}
+	s := strings.Split(str, " ")
+	for _, elem := range s {
+		_, err := f.WriteString(elem + " \n")
+		if err != nil {
+			return err
+		}
+	}
+	defer f.Close()
+	return nil
+}
+
 func defaultSort(str string) string {
-	s := strings.Split(str, "\n")
-	fmt.Println(s[0])
+	s := strings.Split(str, " ")
 	sort.Strings(s)
 	return strings.Join(s, " ")
+}
+
+func SortK(str string, k int) string {
+	s := strings.Split(str, " ")
+	s[k], s[0] = s[0], s[k]
+	sort.Strings(s[1:])
+	return strings.Join(s, " ")
+}
+
+func SortB(str string) string {
+	s := strings.Split(str, " ")
+	return strings.Join(s, "")
+}
+
+func SortM(str string) string {
+	month := [12]string{"january", "february", "march", "april", "august",
+		"may", "june", "july", "september", "october", "november", "december"}
+	s := strings.Split(str, " ")
+	newS := []string{}
+	for _, elemMonth := range month {
+		for i, elem := range s {
+			if strings.Contains(elem, elemMonth) {
+				newS = append(newS, elem)
+				copy(s[i:], s[i+1:])
+				s[len(s)-1] = ""
+				s = s[:len(s)-1]
+			}
+		}
+
+	}
+	for _, elem := range s {
+		newS = append(newS, elem)
+	}
+	str = strings.Join(newS, " ")
+	return str
+}
+
+func SortU(str string) string {
+	s := strings.Split(str, " ")
+	newS := []string{}
+	keys := make(map[string]bool)
+	for _, i := range s {
+		if value := keys[i]; !value {
+			keys[i] = true
+			newS = append(newS, i)
+		}
+	}
+	str = strings.Join(newS, " ")
+	return str
+}
+
+func SortR(str string) string {
+	s := strings.Split(str, " ")
+	for i, j := 0, len(s)-1; i < j; i, j = i+1, j-1 {
+		s[i], s[j] = s[j], s[i]
+	}
+	str = strings.Join(s, " ")
+	return str
 }
 
 func SortN(str string) (string, error) {
@@ -99,10 +171,10 @@ func SortN(str string) (string, error) {
 		newstr := string(d)
 		if newstr != "" {
 			num, err := strconv.Atoi(newstr)
-			if err != nil{
+			if err != nil {
 				return "", err
 			}
-		table[elem] = num
+			table[elem] = num
 		}
 	}
 	nums := []int{}
@@ -110,15 +182,28 @@ func SortN(str string) (string, error) {
 		nums = append(nums, num)
 	}
 	sort.Ints(nums)
-	s = []string{}
-	for _, num := range nums{
-		for i, elem := range table{
-			if num == elem{
-				s = append(s, i)
+	strn := []string{}
+	for _, num := range nums {
+		for i, elem := range table {
+			if num == elem {
+				strn = append(strn, i)
 			}
 		}
 	}
-	return strings.Join(s, " "), nil
+	ints := []string{"0", "1", "2", "3", "4", "5", "6", "7", "8", "9"}
+	for _, elem := range s {
+		var check bool = false
+		for _, elemInt := range ints {
+			if strings.Contains(elem, elemInt) {
+				check = true
+				break
+			}
+		}
+		if !check {
+			strn = append(strn, elem)
+		}
+	}
+	return strings.Join(strn, " "), nil
 }
 
 func SortC(str string, tmp []string) bool {
@@ -154,6 +239,28 @@ func main() {
 	tmp := make([]string, len(s))
 	copy(tmp, s)
 	str = defaultSort(str)
+	if *flags.k != 0 {
+		str = SortK(str, *flags.k)
+	}
+	if *flags.arr[0] {
+		str, err = SortN(str)
+		if err != nil {
+			fmt.Println("Ошибка сортировки чисел")
+			os.Exit(0)
+		}
+	}
+	if *flags.arr[1] {
+		str = SortR(str)
+	}
+	if *flags.arr[2] {
+		str = SortU(str)
+	}
+	if *flags.arr[3] {
+		str = SortM(str)
+	}
+	if *flags.arr[4] {
+		str = SortB(str)
+	}
 	if *flags.arr[5] {
 		ok := SortC(str, tmp)
 		if !ok {
@@ -164,27 +271,9 @@ func main() {
 			os.Exit(0)
 		}
 	}
-	if *flags.arr[0] {
-		str, err = SortN(str)
-		if err != nil{
-			fmt.Println("Ошибка сортировки чисел")
-			os.Exit(0)
-		}
+	err = CreateFile(path, str)
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(0)
 	}
-	if *flags.arr[1] {
-
-	}
-	if *flags.arr[2] {
-
-	}
-	if *flags.arr[3] {
-
-	}
-	if *flags.arr[4] {
-
-	}
-	if *flags.k != 0 {
-
-	}
-	fmt.Println(str)
 }
