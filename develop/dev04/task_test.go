@@ -21,7 +21,7 @@ func Test_searchAnagramma(t *testing.T) {
 		getMap := searchAnagramma(massiv)
 		for key, value := range *getMap {
 			if !reflect.DeepEqual(value, checkMap[key]) {
-				t.Errorf("anagramma() = %v, want %v", getMap, checkMap)
+				t.Errorf("Результат = %v, ожидается %v", value, checkMap[key])
 			}
 		}
 

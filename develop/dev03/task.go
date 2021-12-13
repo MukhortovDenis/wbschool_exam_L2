@@ -127,8 +127,8 @@ func SortM(str string) string {
 		}
 
 	}
-	for _, elem := range s {
-		newS = append(newS, elem)
+	for k := range s {
+		newS = append(newS, s[k])
 	}
 	str = strings.Join(newS, " ")
 	return str
@@ -208,10 +208,7 @@ func SortN(str string) (string, error) {
 
 func SortC(str string, tmp []string) bool {
 	strOld := strings.Join(tmp, " ")
-	if strOld == str {
-		return false
-	}
-	return true
+	return strOld == str
 }
 
 func main() {
