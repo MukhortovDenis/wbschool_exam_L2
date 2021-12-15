@@ -41,7 +41,7 @@ fmt.Printf(“fone after %v”, time.Since(start))
 
 func Out(channels ...<-chan interface{}) <-chan interface{} {
 	wg := sync.WaitGroup{}
-	exit := make(chan interface{}, 1)
+	exit := make(chan interface{})
 	wg.Add(len(channels))
 	for i := range channels {
 		go func(sig <-chan interface{}){
@@ -66,7 +66,6 @@ func main() {
 			defer close(c)
 			time.Sleep(after)
 			c <- struct{}{}
-			fmt.Println("Сработало")
 		}()
 		return c
 	}
